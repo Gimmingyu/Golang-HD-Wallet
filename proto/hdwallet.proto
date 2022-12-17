@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "/hdwallet";
+
+package hdwallet;
+
+service HDWallet {
+  rpc Generate(GenerateRequest) returns (GenerateResponse);
+
+  rpc GetPrivateKey(GetPrivateKeyRequest) returns (GetPrivateKeyResponse);
+}
+
+message GenerateRequest {
+  uint64 userId = 1;
+}
+
+message GenerateResponse {
+  string publicKey = 1;
+}
+
+message GetPrivateKeyRequest {
+  uint64 userId = 1;
+  string publicKey = 2;
+}
+
+message GetPrivateKeyResponse {
+  string privateKey = 1;
+}
