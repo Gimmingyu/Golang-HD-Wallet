@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -27,7 +28,14 @@ func NewGinApp() IGinApp {
 
 func (g *GinApp) SetRouter() {
 
-	_ = g.router.SetTrustedProxies([]string{"localhost:8080"})
+	//_ = g.router.SetTrustedProxies([]string{"http://localhost:8080"})
+	g.router.Use(cors.New(
+		cors.Config{
+			//AllowOrigins:    []string{"http://127.0.0.1:3000"},
+			AllowAllOrigins: true,
+			AllowMethods:    []string{"GET", "POST"},
+			MaxAge:          12 * time.Hour,
+		}))
 	g.router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		// your custom format
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",

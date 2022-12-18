@@ -25,6 +25,7 @@ type (
 func (h *Handler) GetChildPublicKey(ctx *gin.Context) {
 	var req *hdwallet.GenerateRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
+		log.Println(err, err.Error())
 		ctx.JSON(400, gin.H{"message": err.Error()})
 	}
 	r, err := h.client.Generate(ctx, req)
