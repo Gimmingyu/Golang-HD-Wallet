@@ -8,7 +8,7 @@ import (
 
 type (
 	HttpServer struct {
-		app *api.GinApp
+		app api.IGinApp
 		cfg *api.Config
 	}
 

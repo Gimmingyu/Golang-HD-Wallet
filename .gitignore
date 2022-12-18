@@ -15,5 +15,5 @@
 # vendor/
 .env
 .idea
-
-.env
+build/
+gen/

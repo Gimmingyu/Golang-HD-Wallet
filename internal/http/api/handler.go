@@ -25,10 +25,8 @@ type (
 func (h *Handler) GetChildPublicKey(ctx *gin.Context) {
 	var req *hdwallet.GenerateRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		log.Println("HERE!!!")
 		ctx.JSON(400, gin.H{"message": err.Error()})
 	}
-	log.Println(req)
 	r, err := h.client.Generate(ctx, req)
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": err.Error()})
@@ -39,11 +37,8 @@ func (h *Handler) GetChildPublicKey(ctx *gin.Context) {
 func (h *Handler) GetChildPrivateKey(ctx *gin.Context) {
 	var req *hdwallet.GetPrivateKeyRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		log.Println("HERE!!!")
 		ctx.JSON(400, gin.H{"message": err.Error()})
 	}
-
-	log.Println(req)
 	r, err := h.client.GetPrivateKey(ctx, req)
 	if err != nil {
 		ctx.JSON(400, gin.H{"message": err.Error()})

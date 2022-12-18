@@ -13,7 +13,6 @@ type (
 	}
 	IMasterWallet interface {
 		GetPrivateKey(userId uint64, pubKey string) GetPrivateKeyContext
-		GetPublicKey() string
 		GenerateChildWallet(userId uint64) GenerateChannelContext
 	}
 
@@ -32,7 +31,8 @@ func (m *MasterWallet) GenerateChildWallet(userId uint64) GenerateChannelContext
 	path := GetDerivePathForUser(userId)
 	account, err := wallet.Derive(path, true)
 	if err != nil {
-		log.Panicf("Failed to derive : %v\n", err)
+		log.Printf("Failed to derive : %v\n", err)
+		return GenerateChannelContext{}
 	}
 	return GenerateChannelContext{
 		ChildWallet: NewChildWallet(wallet, &account),
@@ -45,15 +45,12 @@ func (m *MasterWallet) GetPrivateKey(userId uint64, pubKey string) GetPrivateKey
 	/* private key 꺼내기 */
 	privateKey, err := generateCtx.ChildWallet.GetPrivateKey()
 	if err != nil {
-		log.Panicf("Failed to get private key from wallet: %v", err)
+		log.Println("Failed to get private key from wallet : ", err)
+		return GetPrivateKeyContext{}
 	}
 	return GetPrivateKeyContext{
 		PrivateKey: privateKey,
 	}
-}
-
-func (m *MasterWallet) GetPublicKey() string {
-	return m.account.Address.Hex()
 }
 
 func CreateNewMasterWallet() IMasterWallet {

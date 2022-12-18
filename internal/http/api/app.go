@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 type (
@@ -16,7 +18,7 @@ type (
 	}
 )
 
-func NewGinApp() *GinApp {
+func NewGinApp() IGinApp {
 	r := gin.Default()
 	h := NewHandler()
 
@@ -24,20 +26,37 @@ func NewGinApp() *GinApp {
 }
 
 func (g *GinApp) SetRouter() {
-	g.router.GET("/", func(ctx *gin.Context) {
+
+	_ = g.router.SetTrustedProxies([]string{"localhost:8080"})
+	g.router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		// your custom format
+		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+			param.ClientIP,
+			param.TimeStamp.Format(time.RFC1123),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
+
+	api := g.router.Group("api")
+	api.Use(gin.Recovery())
+	api.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{"result": "Success"})
 	})
-	g.router.GET("/public/:UserId", g.handler.GetChildPublicKey)
-	g.router.GET("/private/:UserId", g.handler.GetChildPrivateKey)
+
+	deposit := api.Group("deposit")
+	deposit.Use(SetRequestUUID())
+	{
+		deposit.GET("/public/:UserId", g.handler.GetChildPublicKey)
+		deposit.GET("/private/:UserId", g.handler.GetChildPrivateKey)
+	}
 }
 
 func (g *GinApp) Run() error {
-	///* connection Defer로 끊어주기 */
-	//defer func(conn *grpc.ClientConn) {
-	//	err := conn.Close()
-	//	if err != nil {
-	//		log.Panicf("Failed to close rpc connection: %v", err)
-	//	}
-	//}(g.handler.GetConnection())
 	return g.router.Run()
 }
